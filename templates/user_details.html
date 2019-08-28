@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <table class="table table-dark">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Label</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Enabled</th>
+            {% for detail in details %}
+                <th>{{ detail.label }}</th>
+            {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.label }}</td>
+                    <td>{{ user.created }}</td>
+                    <td>{{ user.updated }}</td>
+                    <td>{{ user.enabled }}</td>
+            {% for detail in details %}
+                    <td>{{ detail.value }}</td>
+            {% endfor %}
+                </tr>
+        </tbody>
+    </table>
+{% endblock %}

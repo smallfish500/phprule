@@ -1,0 +1,54 @@
+<?php
+/**
+ * Template trait file
+ * 
+ * PHP version 7
+ * 
+ * @category Model
+ * @package  Rule
+ * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
+ * @license  https://github.com/smallfish500/phprule/blob/master/LICENSE MIT
+ * @link     https://github.com/smallfish500/phprule
+ */
+namespace Rule;
+
+/**
+ * Template trait
+ * 
+ * @category Model
+ * @package  Rule
+ * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
+ * @license  https://github.com/smallfish500/phprule/blob/master/LICENSE MIT
+ * @link     https://github.com/smallfish500/phprule
+ */
+trait Template
+{
+    /**
+     * Diplay the data using Twig
+     * or Json format if the JSON constant is true
+     * 
+     * @param array  $data Data that will be displayed
+     * @param string $tpl  Template name
+     *
+     * @return void
+     */
+    public static function show($data, $tpl = 'index.html')
+    {
+        echo JSON
+            ? json_encode($data)
+            : static::getTwig()->render($tpl, $data + ['base' => BASE . '/']);
+    }
+
+    /**
+     * Returns the Twig environment
+     *
+     * @return \Twig_Environment
+     */
+    public static function getTwig()
+    {
+        return new \Twig_Environment(
+            new \Twig_Loader_Filesystem(TEMPLATES_DIR),
+            ['debug' => DEBUG]
+        );
+    }
+}
