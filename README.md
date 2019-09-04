@@ -1,4 +1,11 @@
 # phprule
+![Badge License](https://img.shields.io/github/license/smallfish500/phprule?style=plastic)
+![Badge CodeSize](https://img.shields.io/github/languages/code-size/smallfish500/phprule?style=plastic)
+![Badge Langs](https://img.shields.io/github/languages/count/smallfish500/phprule?style=plastic)
+![Badge TopLang](https://img.shields.io/github/languages/top/smallfish500/phprule?style=plastic)
+![Badge LastCommit](https://img.shields.io/github/last-commit/smallfish500/phprule?style=plastic)
+![Badge version](https://img.shields.io/github/manifest-json/v/smallfish500/phprule?style=plastic)
+
 Yet Another Addressbooks Approach
 
 ## Directories and Permissions System
