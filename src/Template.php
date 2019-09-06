@@ -35,7 +35,7 @@ trait Template
     public static function show($data, $tpl = 'index.html')
     {
         echo JSON
-            ? json_encode($data)
+            ? json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE)
             : static::getTwig()->render($tpl, $data + ['base' => BASE . '/']);
     }
 
