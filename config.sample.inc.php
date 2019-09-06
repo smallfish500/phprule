@@ -14,10 +14,15 @@ define('APP', 'Rule');
 define('SRC', 'src/');
 define('LOG', 'logs/');
 define('BASE', '/rule');
+define('HOST_URL', 'http://'.$_SERVER['HTTP_HOST']);
 define('HTTP_METHODS', 'HEAD,GET,DELETE,POST,PATCH');
 define('DATABASE_URL', 'pdo-mysql://root:password@127.0.0.1:3306/rule?charset=utf8');
 define('TEMPLATES_DIR', './templates');
 define('JSON', false);
+define(
+    'CONTENT_TYPE',
+    JSON ? 'application/json;charset=UTF-8' : 'text/html;charset=UTF-8'
+);
 define('USER_SECRET', 'mysecret');
 define('PASS_SECRET', 'mysecret');
 define('TOKEN_SECRET', 'mysecret');

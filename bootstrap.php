@@ -89,17 +89,17 @@ case FastRoute\Dispatcher::FOUND:
     if (!is_callable($route[1])) {
         $log->error('ROUTE NOT CALLABLE - '.var_export($route));
     } else {
+        header('Content-Type: '.CONTENT_TYPE);
         $log->notice(SRV_PROTO.' FOUND');
         if (in_array(REQ_METHOD, ['HEAD', 'GET'])) {
             header('Allow: ' . HTTP_METHODS);
         } elseif (REQ_METHOD == 'POST') {
             header(SRV_PROTO.' 201 Created');
             //header('Content-Location: ', ''); // XXX
-            //header('ETag: ', ''); // XXX
         } elseif (REQ_METHOD == 'PATCH') {
             header(SRV_PROTO.' 204 No Content'); // XXX 200
-            //header('Content-Location: ', ''); // XXX
-            //header('ETag: ', ''); // XXX
+            $location = substr(BASE.$uri, 0, strrpos(BASE.$uri, '/'));
+            header('Content-Location: '.HOST_URL.$location);
         } elseif (REQ_METHOD == 'DELETE') {
             header(SRV_PROTO.' 204 No Content');
         }
