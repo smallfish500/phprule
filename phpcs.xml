@@ -15,5 +15,5 @@
             <property name="ignoreBlankLines" value="false"/>
         </properties>
     </rule>
+    <rule ref="Generic.WhiteSpace.ScopeIndent"/>
 </ruleset>
-

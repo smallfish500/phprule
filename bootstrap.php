@@ -121,7 +121,14 @@ default:
 $log->info('Dispatched');
 
 if (DEBUG) {
-    var_dump(memory_get_peak_usage());
+    $usage = round(memory_get_peak_usage()/1048516, 2).'MB';
+    //$logger = \Rule\Database::getDatabase()->getConfiguration()->getSqlLogger();
+    echo '<pre>';
+    echo '<strong>memory_get_peak_usage</strong>: '.$usage;
+    echo '<br><strong>cache stats</strong>: ';
+    echo var_export(\Rule\Cache::getDbCache()->getStats(), 1);
+    //echo '<br>database queries: '.var_export($logger->queries, 1); // XXX
+    echo '</pre>';
 }
-$log->info('Bootstrap FINISHED');
 
+$log->info('Bootstrap FINISHED');

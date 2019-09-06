@@ -30,7 +30,7 @@ class Users
     use Template;
 
     const USER_CACHE_KEY = 'user-';
-    const DETAILS_CACHE_KEY = 'user-';
+    const DETAILS_CACHE_KEY = 'details-';
 
     /**
      * Get one user without the details
@@ -135,6 +135,7 @@ class Users
 
     /**
      * Toggle one user status
+     * and flush user cache
      *
      * @param int  $user_id User identifier
      * @param bool $enabled Enables if true and disables if false
@@ -155,7 +156,7 @@ class Users
     }
 
     /**
-     * Fetch one user from database
+     * Fetch one user from database (and cache it)
      * or from cache if it has been cached
      *
      * @param int $user_id User identifier
@@ -181,7 +182,7 @@ class Users
     }
 
     /**
-     * Fetch one user's details from database
+     * Fetch one user's details from database (and cache it)
      * or from cache if it has been cached
      *
      * @param int $user_id User identifier

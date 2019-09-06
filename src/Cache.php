@@ -32,9 +32,9 @@ trait Cache
     {
         $redis = new \Redis();
         $redis->connect(REDIS_HOST, REDIS_PORT);
-        $cacheDriver = new \Doctrine\Common\Cache\RedisCache();
-        $cacheDriver->setRedis($redis);
+        $driver = new \Doctrine\Common\Cache\RedisCache();
+        $driver->setRedis($redis);
 
-        return $cacheDriver;
+        return $driver;
     }
 }

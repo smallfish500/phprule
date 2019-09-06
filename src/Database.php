@@ -30,9 +30,13 @@ trait Database
      */
     public static function getDatabase()
     {
+        $config = new \Doctrine\DBAL\Configuration();
+        if (DEBUG) {
+            $config->setSQLLogger(new \Doctrine\DBAL\Logging\DebugStack());
+        }
         return \Doctrine\DBAL\DriverManager::getConnection(
             ['url' => DATABASE_URL],
-            new \Doctrine\DBAL\Configuration()
+            $config
         );
     }
 }
