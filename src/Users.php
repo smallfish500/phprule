@@ -29,6 +29,9 @@ class Users
     use Cache;
     use Template;
 
+    const USER_CACHE_KEY = 'user-';
+    const DETAILS_CACHE_KEY = 'user-';
+
     /**
      * Get one user without the details
      *
@@ -140,6 +143,7 @@ class Users
      */
     private function _toggleStatus($user_id, $enabled)
     {
+        static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
         return static::getDatabase()->executeQuery(
             'UPDATE user SET enabled = ? WHERE id = ?',
             [$enabled, $user_id],
@@ -161,7 +165,7 @@ class Users
     private static function _fetchUser($user_id)
     {
         $cache = static::getDbCache();
-        $key = __METHOD__.'-'.$user_id;
+        $key = static::USER_CACHE_KEY.'-'.$user_id;
         if ($cache->contains($key)) {
             $user = $cache->fetch($key);
         } else {
@@ -187,7 +191,7 @@ class Users
     private static function _fetchDetails($user_id)
     {
         $cache = static::getDbCache();
-        $key = __METHOD__.'-'.$user_id;
+        $key = static::DETAILS_CACHE_KEY.'-'.$user_id;
         if ($cache->contains($key)) {
             $details = $cache->fetch($key);
         } else {
