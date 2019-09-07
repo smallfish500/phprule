@@ -74,15 +74,20 @@ class Users
     }
 
     /**
-     * Delete one user with the details
+     * Delete one user and related data
      *
      * @param int $user_id User identifier
-     * 
+     *
      * @return void
      */
     public static function delete($user_id)
     {
-        // XXX
+        $user = static::_fetchUser($user_id);
+        $success = static::_delete($user_id);
+        static::show(
+            ['user' => $user, 'message' => $success ? 'success' : 'failure'],
+            'user_action.html'
+        );
     }
 
     /**
@@ -134,6 +139,38 @@ class Users
     }
 
     /**
+     * Remove one user and related data from storage
+     *
+     * @param int $user_id User identifier
+     * 
+     * @return bool
+     */
+    private static function _delete($user_id)
+    {
+        return static::getDatabase()->executeQuery(
+            'DELETE FROM user_detail WHERE user_id = ?',
+            [$user_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        ) && static::getDatabase()->executeQuery(
+            'DELETE FROM contact WHERE user_id = ?',
+            [$user_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        ) && static::getDatabase()->executeQuery(
+            'DELETE FROM user_addressbook WHERE user_id = ?',
+            [$user_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        ) && static::getDatabase()->executeQuery(
+            'DELETE FROM user_role WHERE user_id = ?',
+            [$user_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        ) && static::getDatabase()->executeQuery(
+            'DELETE FROM user WHERE id = ?',
+            [$user_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        ) && static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
+    }
+
+    /**
      * Toggle one user status
      * and flush user cache
      *
@@ -144,8 +181,7 @@ class Users
      */
     private function _toggleStatus($user_id, $enabled)
     {
-        static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
-        return static::getDatabase()->executeQuery(
+        static::getDatabase()->executeQuery(
             'UPDATE user SET enabled = ? WHERE id = ?',
             [$enabled, $user_id],
             [
@@ -153,6 +189,7 @@ class Users
                 \Doctrine\DBAL\ParameterType::INTEGER,
             ]
         );
+        static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
     }
 
     /**
@@ -196,7 +233,8 @@ class Users
         if ($cache->contains($key)) {
             $details = $cache->fetch($key);
         } else {
-            $details_query = 'SELECT detail.label, AES_DECRYPT(value, ?) value '.
+            $details_query = 'SELECT detail.label, '.
+                'AES_DECRYPT(value, UNHEX(SHA2(?, 512))) value '.
                 'FROM user_detail ' .
                 'INNER JOIN detail ON detail.id = user_detail.detail_id '.
                 'WHERE user_id = ?';

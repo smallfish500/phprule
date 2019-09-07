@@ -101,7 +101,7 @@ case FastRoute\Dispatcher::FOUND:
             $location = substr(BASE.$uri, 0, strrpos(BASE.$uri, '/'));
             header('Content-Location: '.HOST_URL.$location);
         } elseif (REQ_METHOD == 'DELETE') {
-            header(SRV_PROTO.' 204 No Content');
+            header(SRV_PROTO.' 200 OK');
         }
         call_user_func_array($route[1], $route[2]);
     }
