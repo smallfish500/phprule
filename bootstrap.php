@@ -35,8 +35,8 @@ $dispatcher = \FastRoute\simpleDispatcher(
                     'details' => '/users/{id:\d+}/details',
                 ],
                 'delete' => '/users/{id:\d+}',
-                'post' => '/users/{id:\d+}', // https://tools.ietf.org/html/rfc2616
-                'patch' => [ // https://tools.ietf.org/html/rfc5789
+                'post' => '/users', // https://www.ietf.org/rfc/rfc2616.txt
+                'patch' => [ // https://www.ietf.org/rfc/rfc5789.txt
                     'modify' => '/users/{id:\d+}',
                     'enable' => '/users/{id:\d+}/enable',
                     'disable' => '/users/{id:\d+}/disable',

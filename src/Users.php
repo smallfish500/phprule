@@ -92,14 +92,28 @@ class Users
 
     /**
      * Create one user
-     *
-     * @param int $user_id User identifier
      * 
      * @return void
      */
-    public static function post($user_id)
+    public static function post()
     {
-        // XXX
+        $db = static::getDatabase();
+        $insert = $db->executeQuery(
+            'INSERT INTO user (label, password, enabled, create_user_id, created) '.
+            'VALUES (?, ?, 1, ?, NOW())',
+            [
+                $_POST['label'],
+                $_POST['password'],
+                1, // XXX
+            ],
+            [
+                \Doctrine\DBAL\ParameterType::STRING,
+                \Doctrine\DBAL\ParameterType::BINARY,
+                \Doctrine\DBAL\ParameterType::INTEGER,
+            ]
+        );
+
+        static::one((int)$db->lastInsertId());
     }
 
     /**
@@ -111,7 +125,31 @@ class Users
      */
     public static function modify($user_id)
     {
-        // XXX
+        parse_str(file_get_contents('php://input'), $_PATCH);
+        $params = [
+            'id' => $user_id,
+            'update_user_id' => 1, // XXX
+        ];
+        $types = [
+            'id' => \Doctrine\DBAL\ParameterType::INTEGER,
+            'update_user_id' => \Doctrine\DBAL\ParameterType::INTEGER,
+        ];
+        if (!empty($_PATCH['label'])) {
+            $params += ['label' => $_PATCH['label']];
+            $types +=  ['label' => \Doctrine\DBAL\ParameterType::STRING];
+        }
+        if (!empty($_PATCH['password'])) {
+            $params += ['password' => $_PATCH['password']];
+            $types +=  ['label' => \Doctrine\DBAL\ParameterType::BINARY];
+        }
+
+        static::getDatabase()->executeQuery(
+            'UPDATE user  SET '.
+            (!empty($_PATCH['label']) ? 'label = :label, ' : '').
+            (!empty($_PATCH['password']) ? 'password = :password, ' : '').
+            'update_user_id = :update_user_id, updated = NOW() WHERE id = :id',
+            $params, $types
+        );
     }
 
     /**
@@ -147,27 +185,28 @@ class Users
      */
     private static function _delete($user_id)
     {
-        return static::getDatabase()->executeQuery(
+        $conn = static::getDatabase();
+        return $conn->executeQuery(
             'DELETE FROM user_detail WHERE user_id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && static::getDatabase()->executeQuery(
+        ) && $conn->executeQuery(
             'DELETE FROM contact WHERE user_id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && static::getDatabase()->executeQuery(
+        ) && $conn->executeQuery(
             'DELETE FROM user_addressbook WHERE user_id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && static::getDatabase()->executeQuery(
+        ) && $conn->executeQuery(
             'DELETE FROM user_role WHERE user_id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && static::getDatabase()->executeQuery(
+        ) && $conn->executeQuery(
             'DELETE FROM user WHERE id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
+        ) && $conn->delete(static::USER_CACHE_KEY.'-'.$user_id);
     }
 
     /**
