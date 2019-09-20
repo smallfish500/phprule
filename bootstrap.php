@@ -17,14 +17,14 @@ $log = new \Monolog\Logger(APP);
 $log->pushHandler(
     new \Monolog\Handler\StreamHandler(
         LOG.APP.'.log',
-        DEBUG ? \Monolog\Logger::DEBUG  : \Monolog\Logger::ERROR
+        DEBUG ? \Monolog\Logger::DEBUG : \Monolog\Logger::ERROR
     )
 );
 
 $log->info('Bootstrap STARTED');
 $log->info('Creating routes...');
 $dispatcher = \FastRoute\simpleDispatcher(
-    function (FastRoute\RouteCollector $router) use ($log) {
+    function(FastRoute\RouteCollector $router) use ($log) {
         $routes = [
             'users' => [
                 'head' => '/users',
@@ -38,7 +38,7 @@ $dispatcher = \FastRoute\simpleDispatcher(
                 ],
                 'delete' => '/users/{id:\d+}',
                 'post' => '/users', // https://www.ietf.org/rfc/rfc2616.txt
-                'patch' => [ // https://www.ietf.org/rfc/rfc5789.txt
+                'patch' => [// https://www.ietf.org/rfc/rfc5789.txt
                     'modify' => '/users/{id:\d+}',
                     'enable' => '/users/{id:\d+}/enable',
                     'disable' => '/users/{id:\d+}/disable',
@@ -52,8 +52,8 @@ $dispatcher = \FastRoute\simpleDispatcher(
                 if ($method == 'head') {
                     $router->head(
                         $route,
-                        function () {
-                            header('Allow: ' . HTTP_METHODS);
+                        function() {
+                            header('Allow: '.HTTP_METHODS);
                         }
                     );
                 } elseif (is_string($route)) {
@@ -94,7 +94,7 @@ case FastRoute\Dispatcher::FOUND:
         header('Content-Type: '.CONTENT_TYPE);
         $log->notice(SRV_PROTO.' FOUND');
         if (in_array(REQ_METHOD, ['HEAD', 'GET'])) {
-            header('Allow: ' . HTTP_METHODS);
+            header('Allow: '.HTTP_METHODS);
         } elseif (REQ_METHOD == 'POST') {
             header(SRV_PROTO.' 201 Created');
             //header('Content-Location: ', ''); // XXX
