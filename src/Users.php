@@ -37,18 +37,23 @@ class Users
      *
      * @param int $user_id User identifier
      * 
-     * @return void
+     * @return bool
      */
     public static function one($user_id)
     {
+        if (!static::can('user_display')) {
+            return false;
+        }
         $user = static::_fetchUser($user_id);
         static::show(['users' => [$user]]);
+
+        return true;
     }
 
     /**
      * Get the connected user and the details
      *
-     * @return void
+     * @return bool
      */
     public static function me()
     {
@@ -57,6 +62,8 @@ class Users
         $details = static::_fetchDetails($my_id);
 
         static::show(['user' => $user, 'details' => $details], 'user_details.html');
+
+        return true;
     }
 
     /**
@@ -64,13 +71,25 @@ class Users
      *
      * @param int $user_id User identifier
      * 
-     * @return void
+     * @return bool
      */
     public static function details($user_id)
     {
         $user = static::_fetchUser($user_id);
         $details = static::_fetchDetails($user_id);
         static::show(['user' => $user, 'details' => $details], 'user_details.html');
+
+        return true;
+    }
+
+    public static function addressbooks($user_id)
+    {
+        return true;
+    }
+
+    public static function addressbook($addressbook_id)
+    {
+        return true;
     }
 
     /**
@@ -78,7 +97,7 @@ class Users
      *
      * @param int $user_id User identifier
      *
-     * @return void
+     * @return bool
      */
     public static function delete($user_id)
     {
@@ -88,6 +107,8 @@ class Users
             ['user' => $user, 'message' => $success ? 'success' : 'failure'],
             'user_action.html'
         );
+
+        return true;
     }
 
     /**
@@ -104,7 +125,7 @@ class Users
             [
                 $_POST['label'],
                 $_POST['password'],
-                1, // XXX
+                1, // XXX authenticated user
             ],
             [
                 \Doctrine\DBAL\ParameterType::STRING,
@@ -114,6 +135,8 @@ class Users
         );
 
         static::one((int)$db->lastInsertId());
+
+        return true;
     }
 
     /**
@@ -128,7 +151,7 @@ class Users
         parse_str(file_get_contents('php://input'), $_PATCH);
         $params = [
             'id' => $user_id,
-            'update_user_id' => 1, // XXX
+            'update_user_id' => 1, // XXX authenticated user
         ];
         $types = [
             'id' => \Doctrine\DBAL\ParameterType::INTEGER,
@@ -150,6 +173,8 @@ class Users
             'update_user_id = :update_user_id, updated = NOW() WHERE id = :id',
             $params, $types
         );
+
+        return true;
     }
 
     /**
@@ -157,11 +182,13 @@ class Users
      *
      * @param int $user_id User identifier
      * 
-     * @return void
+     * @return bool
      */
     public static function enable($user_id)
     {
-        return static::_toggleStatus($user_id, true);
+        static::_toggleStatus($user_id, true);
+
+        return true;
     }
 
     /**
@@ -169,11 +196,46 @@ class Users
      *
      * @param int $user_id User identifier
      * 
-     * @return void
+     * @return bool
      */
     public static function disable($user_id)
     {
-        return static::_toggleStatus($user_id, false);
+        static::_toggleStatus($user_id, false);
+
+        return true;
+    }
+
+    /**
+     * Returns true if $user_id has $privilege
+     *
+     * @param string  $privilege Privilege label
+     * @param integer $user_id   User identifier
+     * 
+     * @return boolean
+     */
+    public static function can($privilege, $user_id = 0)
+    {
+        if (!$user_id) {
+            $user_id = 1; // XXX authenticated user
+        }
+        if (!is_string($privilege)) {
+            return false;
+        }
+
+        $found_privilege = static::getDatabase()->executeQuery(
+            'SELECT * FROM user_role ur '.
+            'INNER JOIN role_privilege rp ON rp.role_id = ur.role_id '.
+            'INNER JOIN privilege p ON p.id = rp.privilege_id '.
+            'AND p.label = ? AND p.enabled = 1 '.
+            'WHERE ur.user_id = ?',
+            [$privilege, $user_id],
+            [
+                \Doctrine\DBAL\ParameterType::STRING,
+                \Doctrine\DBAL\ParameterType::INTEGER
+            ]
+        )->fetch();
+
+        return (bool)$found_privilege;
     }
 
     /**

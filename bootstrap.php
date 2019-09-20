@@ -103,7 +103,11 @@ case FastRoute\Dispatcher::FOUND:
         } elseif (REQ_METHOD == 'DELETE') {
             header(SRV_PROTO.' 200 OK');
         }
-        call_user_func_array($route[1], $route[2]);
+        if (!call_user_func_array($route[1], $route[2])) {
+            $header = SRV_PROTO.' 403 Forbidden';
+            $log->warning($header);
+            header($header);
+        }
     }
     break;
 case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
