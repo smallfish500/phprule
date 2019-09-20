@@ -167,7 +167,7 @@ class Users
             ]
         );
 
-        static::one((int)$db->lastInsertId());
+        static::one((int) $db->lastInsertId());
 
         return true;
     }
@@ -192,13 +192,13 @@ class Users
         ];
         if (!empty($_PATCH['label'])) {
             $params += ['label' => $_PATCH['label']];
-            $types +=  ['label' => \Doctrine\DBAL\ParameterType::STRING];
+            $types += ['label' => \Doctrine\DBAL\ParameterType::STRING];
         }
         if (!empty($_PATCH['password'])) {
             $params += ['password' => $_PATCH['password']];
             $params += ['secret' => PASS_SECRET];
-            $types +=  ['label' => \Doctrine\DBAL\ParameterType::BINARY];
-            $types +=  ['secret' => \Doctrine\DBAL\ParameterType::STRING];
+            $types += ['label' => \Doctrine\DBAL\ParameterType::BINARY];
+            $types += ['secret' => \Doctrine\DBAL\ParameterType::STRING];
         }
 
         $query = 'UPDATE user SET '.
@@ -270,7 +270,7 @@ class Users
             ]
         )->fetch();
 
-        return (bool)$found_privilege;
+        return (bool) $found_privilege;
     }
 
     /**
@@ -375,7 +375,7 @@ class Users
         } else {
             $details_query = 'SELECT detail.label, '.
                 'AES_DECRYPT(value, UNHEX(SHA2(?, 512))) value '.
-                'FROM user_detail ' .
+                'FROM user_detail '.
                 'INNER JOIN detail ON detail.id = user_detail.detail_id '.
                 'WHERE user_id = ?';
             $details = static::getDatabase()->executeQuery(
