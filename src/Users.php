@@ -88,6 +88,8 @@ class Users
      * @param int $user_id User identifier
      *
      * @return int
+     * 
+     * @todo return addressbooks using cache
      */
     public static function addressbooks($user_id)
     {
@@ -100,6 +102,8 @@ class Users
      * @param int $addressbook_id Addressbook identifier
      *
      * @return bool
+     * 
+     * @todo add cache
      */
     public static function addressbook($addressbook_id)
     {
@@ -426,4 +430,3 @@ class Users
         return (array) $details;
     }
 }
-

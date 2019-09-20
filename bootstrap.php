@@ -64,7 +64,7 @@ $dispatcher = \FastRoute\simpleDispatcher(
                 } else {
                     $log->error(
                         'BAD ROUTE - Group: '.$group.' Method: '.$method.
-                        ' Value: '.var_export($route, 1)
+                        ' Value: '.$route
                     );
                 }
             }
@@ -88,7 +88,7 @@ case FastRoute\Dispatcher::FOUND:
         ['GET' => $_GET, 'POST' => $_POST, 'SERVER' => $_SERVER]
     );
     if (!is_callable($route[1])) {
-        $log->error('ROUTE NOT CALLABLE - '.var_export($route));
+        $log->error('ROUTE NOT CALLABLE - '.$route);
     } else {
         header('Content-Type: '.CONTENT_TYPE);
         $log->notice(SRV_PROTO.' FOUND');
@@ -134,8 +134,9 @@ if (DEBUG) {
         echo '<pre>';
         echo '<strong>memory_get_peak_usage</strong>: '.$usage;
         echo '<br><strong>cache stats</strong>: ';
-        echo var_export(\Rule\Cache::getDbCache()->getStats(), 1);
-        //echo '<br>database queries: '.var_export($logger->queries, 1); // XXX
+        print_r(\Rule\Cache::getDbCache()->getStats());
+        //echo '<br>database queries:<br>';
+        //print_r($logger->queries); // XXX
         echo '</pre>';
     } else {
         // XXX

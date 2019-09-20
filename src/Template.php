@@ -48,8 +48,8 @@ trait Template
     {
         static $twig;
         if (empty($twig)) {
-            $twig = new \Twig_Environment(
-                new \Twig_Loader_Filesystem(TEMPLATES_DIR),
+            $twig = new \Twig\Environment(
+                new \Twig\Loader\FilesystemLoader(TEMPLATES_DIR),
                 ['debug' => DEBUG]
             );
         }

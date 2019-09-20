@@ -30,4 +30,4 @@ define('DEBUG', true);
 define('SRV_PROTO', $_SERVER['SERVER_PROTOCOL']);
 define('REQ_METHOD', $_SERVER['REQUEST_METHOD']);
 define('REDIS_HOST', '127.0.0.1');
-define('REDIS_PORT', '6379');
+define('REDIS_PORT', 6379);
