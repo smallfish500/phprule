@@ -303,7 +303,7 @@ class Users
             'DELETE FROM user WHERE id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && $conn->delete(static::USER_CACHE_KEY.'-'.$user_id);
+        ) && static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
     }
 
     /**
