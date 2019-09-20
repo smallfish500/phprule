@@ -82,6 +82,13 @@ class Users
         return true;
     }
 
+    /**
+     * Returns the addressbooks list for a given $user_id
+     *
+     * @param int $user_id User identifier
+     *
+     * @return bool
+     */
     public static function addressbooks($user_id)
     {
         return true;

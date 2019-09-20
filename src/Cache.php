@@ -30,10 +30,13 @@ trait Cache
      */
     public static function getDbCache()
     {
-        $redis = new \Redis();
-        $redis->connect(REDIS_HOST, REDIS_PORT);
-        $driver = new \Doctrine\Common\Cache\RedisCache();
-        $driver->setRedis($redis);
+        static $driver;
+        if (empty($driver)) {
+            $redis = new \Redis();
+            $redis->connect(REDIS_HOST, REDIS_PORT);
+            $driver = new \Doctrine\Common\Cache\RedisCache();
+            $driver->setRedis($redis);
+        }
 
         return $driver;
     }
