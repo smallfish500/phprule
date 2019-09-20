@@ -87,11 +87,11 @@ class Users
      *
      * @param int $user_id User identifier
      *
-     * @return bool
+     * @return int
      */
     public static function addressbooks($user_id)
     {
-        return true;
+        return $user_id;
     }
 
     /**
@@ -145,12 +145,12 @@ class Users
     /**
      * Create one user
      * 
-     * @return void
+     * @return bool
      */
     public static function post()
     {
         $db = static::getDatabase();
-        $insert = $db->executeQuery(
+        $db->executeQuery(
             'INSERT INTO user (label, password, enabled, create_user_id, created) '.
             'VALUES (?, AES_ENCRYPT(?, UNHEX(SHA2(?, 512))), 1, ?, NOW())',
             [
@@ -177,7 +177,7 @@ class Users
      *
      * @param int $user_id User identifier
      * 
-     * @return void
+     * @return bool
      */
     public static function modify($user_id)
     {
@@ -253,9 +253,6 @@ class Users
         if (!$user_id) {
             $user_id = 1; // XXX authenticated user
         }
-        if (!is_string($privilege)) {
-            return false;
-        }
 
         $found_privilege = static::getDatabase()->executeQuery(
             'SELECT * FROM user_role ur '.
@@ -298,7 +295,7 @@ class Users
      *
      * @return bool
      */
-    private function _deleteUserDetailsAndRoles($user_id)
+    private static function _deleteUserDetailsAndRoles($user_id)
     {
         $conn = static::getDatabase();
         return $conn->executeQuery(
@@ -319,7 +316,7 @@ class Users
      *
      * @return bool
      */
-    private function _deleteContactsAndAddressbooks($user_id)
+    private static function _deleteContactsAndAddressbooks($user_id)
     {
         $conn = static::getDatabase();
         return $conn->executeQuery(
@@ -342,7 +339,7 @@ class Users
      * 
      * @return void
      */
-    private function _toggleStatus($user_id, $enabled)
+    private static function _toggleStatus($user_id, $enabled)
     {
         static::getDatabase()->executeQuery(
             'UPDATE user SET enabled = ? WHERE id = ?',
