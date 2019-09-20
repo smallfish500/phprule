@@ -243,8 +243,8 @@ class Users
     /**
      * Returns true if $user_id has $privilege
      *
-     * @param string  $privilege Privilege label
-     * @param integer $user_id   User identifier
+     * @param string $privilege Privilege label
+     * @param int    $user_id   User identifier
      * 
      * @return boolean
      */
@@ -277,10 +277,28 @@ class Users
      * Remove one user and related data from storage
      *
      * @param int $user_id User identifier
-     * 
+     *
      * @return bool
      */
     private static function _delete($user_id)
+    {
+        return static::_deleteUserDetailsAndRoles($user_id)
+        && static::_deleteContactsAndAddressbooks($user_id)
+        && static::getDatabase()->executeQuery(
+            'DELETE FROM user WHERE id = ?',
+            [$user_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        ) && static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
+    }
+
+    /**
+     * Deletes details and roles for a given user
+     *
+     * @param int $user_id User identifier
+     *
+     * @return bool
+     */
+    private function _deleteUserDetailsAndRoles($user_id)
     {
         $conn = static::getDatabase();
         return $conn->executeQuery(
@@ -288,6 +306,23 @@ class Users
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
         ) && $conn->executeQuery(
+            'DELETE FROM user_role WHERE user_id = ?',
+            [$user_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        );
+    }
+
+    /**
+     * Deletes contacts and addressbooks for a given user
+     *
+     * @param int $user_id User identifier
+     *
+     * @return bool
+     */
+    private function _deleteContactsAndAddressbooks($user_id)
+    {
+        $conn = static::getDatabase();
+        return $conn->executeQuery(
             'DELETE FROM contact WHERE user_id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
@@ -295,15 +330,7 @@ class Users
             'DELETE FROM user_addressbook WHERE user_id = ?',
             [$user_id],
             [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && $conn->executeQuery(
-            'DELETE FROM user_role WHERE user_id = ?',
-            [$user_id],
-            [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && $conn->executeQuery(
-            'DELETE FROM user WHERE id = ?',
-            [$user_id],
-            [\Doctrine\DBAL\ParameterType::INTEGER]
-        ) && static::getDbCache()->delete(static::USER_CACHE_KEY.'-'.$user_id);
+        );
     }
 
     /**
