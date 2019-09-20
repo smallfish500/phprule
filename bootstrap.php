@@ -33,6 +33,8 @@ $dispatcher = \FastRoute\simpleDispatcher(
                     'me' => '/users/me',
                     'one' => '/users/{id:\d+}',
                     'details' => '/users/{id:\d+}/details',
+                    'addressbooks' => '/users/{id:\d+}/addressbooks',
+                    'addressbook' => '/users/addressbook/{id:\d+}',
                 ],
                 'delete' => '/users/{id:\d+}',
                 'post' => '/users', // https://www.ietf.org/rfc/rfc2616.txt

@@ -87,8 +87,32 @@ class Users
         return true;
     }
 
+    /**
+     * Displays contacts of $addressbook_id
+     *
+     * @param int $addressbook_id Addressbook identifier
+     *
+     * @return bool
+     */
     public static function addressbook($addressbook_id)
     {
+        // XXX check if it belongs to the connected user
+        // 403 (return false) if it does not
+        $users = static::getDatabase()->executeQuery(
+            'SELECT u.*, '.
+            'AES_DECRYPT(u.password, UNHEX(SHA2(:secret, 512))) password '.
+            'FROM user u '.
+            'INNER JOIN contact c ON u.id = c.user_id '.
+            'WHERE c.addressbook_id = :id',
+            ['secret' => PASS_SECRET, 'id' => $addressbook_id],
+            [
+                'secret' => \Doctrine\DBAL\ParameterType::STRING,
+                'id' => \Doctrine\DBAL\ParameterType::INTEGER
+            ]
+        )->fetchAll();
+
+        static::show(['users' => $users]);
+
         return true;
     }
 
@@ -121,15 +145,17 @@ class Users
         $db = static::getDatabase();
         $insert = $db->executeQuery(
             'INSERT INTO user (label, password, enabled, create_user_id, created) '.
-            'VALUES (?, ?, 1, ?, NOW())',
+            'VALUES (?, AES_ENCRYPT(?, UNHEX(SHA2(?, 512))), 1, ?, NOW())',
             [
                 $_POST['label'],
-                $_POST['password'],
+                $_POST['password'], // XXX AES encrypt
+                PASS_SECRET,
                 1, // XXX authenticated user
             ],
             [
                 \Doctrine\DBAL\ParameterType::STRING,
                 \Doctrine\DBAL\ParameterType::BINARY,
+                \Doctrine\DBAL\ParameterType::STRING,
                 \Doctrine\DBAL\ParameterType::INTEGER,
             ]
         );
@@ -163,16 +189,18 @@ class Users
         }
         if (!empty($_PATCH['password'])) {
             $params += ['password' => $_PATCH['password']];
+            $params += ['secret' => PASS_SECRET];
             $types +=  ['label' => \Doctrine\DBAL\ParameterType::BINARY];
+            $types +=  ['secret' => \Doctrine\DBAL\ParameterType::STRING];
         }
 
-        static::getDatabase()->executeQuery(
-            'UPDATE user  SET '.
+        $query = 'UPDATE user SET '.
             (!empty($_PATCH['label']) ? 'label = :label, ' : '').
-            (!empty($_PATCH['password']) ? 'password = :password, ' : '').
-            'update_user_id = :update_user_id, updated = NOW() WHERE id = :id',
-            $params, $types
-        );
+            (!empty($_PATCH['password']) ? 'password = '.
+            'AES_ENCRYPT(:password, UNHEX(SHA2(:secret, 512))), ' : '').
+            'update_user_id = :update_user_id, updated = NOW() WHERE id = :id';
+
+        static::getDatabase()->executeQuery($query, $params, $types);
 
         return true;
     }
@@ -309,9 +337,13 @@ class Users
             $user = $cache->fetch($key);
         } else {
             $user = static::getDatabase()->executeQuery(
-                'SELECT * FROM user WHERE id = ? AND enabled = 1',
-                [$user_id],
-                [\Doctrine\DBAL\ParameterType::INTEGER]
+                'SELECT *, AES_DECRYPT(password, UNHEX(SHA2(?, 512))) password '.
+                'FROM user WHERE id = ? AND enabled = 1',
+                [PASS_SECRET, $user_id],
+                [
+                    \Doctrine\DBAL\ParameterType::STRING,
+                    \Doctrine\DBAL\ParameterType::INTEGER
+                ]
             )->fetch();
             $cache->save($key, $user);
         }
@@ -343,7 +375,7 @@ class Users
                 $details_query,
                 [USER_SECRET, $user_id],
                 [
-                    \Doctrine\DBAL\ParameterType::BINARY,
+                    \Doctrine\DBAL\ParameterType::STRING,
                     \Doctrine\DBAL\ParameterType::INTEGER
                 ]
             )->fetchAll();
