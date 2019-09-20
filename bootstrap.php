@@ -29,7 +29,6 @@ $dispatcher = \FastRoute\simpleDispatcher(
             'users' => [
                 'head' => '/users',
                 'get' => [
-                    'all' => '/users',
                     'me' => '/users/me',
                     'one' => '/users/{id:\d+}',
                     'details' => '/users/{id:\d+}/details',

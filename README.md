@@ -4,7 +4,8 @@
 ![Badge Langs](https://img.shields.io/github/languages/count/smallfish500/phprule?style=plastic)
 ![Badge TopLang](https://img.shields.io/github/languages/top/smallfish500/phprule?style=plastic)
 ![Badge LastCommit](https://img.shields.io/github/last-commit/smallfish500/phprule?style=plastic)
-![Badge version](https://img.shields.io/github/manifest-json/v/smallfish500/phprule?style=plastic)
+![Badge Version](https://img.shields.io/github/manifest-json/v/smallfish500/phprule?style=plastic)
+![Badge CodeQuality](https://img.shields.io/scrutinizer/quality/g/smallfish500/phprule/master?style=plastic)
 
 Yet Another Addressbooks Approach
 
