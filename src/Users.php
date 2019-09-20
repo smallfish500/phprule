@@ -57,7 +57,7 @@ class Users
      */
     public static function me()
     {
-        $my_id = 1; // XXX
+        $my_id = 1; // XXX authenticated user
         $user = static::_fetchUser($my_id);
         $details = static::_fetchDetails($my_id);
 
@@ -103,8 +103,18 @@ class Users
      */
     public static function addressbook($addressbook_id)
     {
-        // XXX check if it belongs to the connected user
-        // 403 (return false) if it does not
+        $db = static::getDatabase();
+
+        $addressbook = $db->executeQuery(
+            'SELECT user_id FROM user_addressbook '.
+            'WHERE addressbook_id = ?',
+            [$addressbook_id],
+            [\Doctrine\DBAL\ParameterType::INTEGER]
+        )->fetch();
+        if (!$addressbook) {
+            return false;
+        }
+
         $users = static::getDatabase()->executeQuery(
             'SELECT u.*, '.
             'AES_DECRYPT(u.password, UNHEX(SHA2(:secret, 512))) password '.
@@ -155,7 +165,7 @@ class Users
             'VALUES (?, AES_ENCRYPT(?, UNHEX(SHA2(?, 512))), 1, ?, NOW())',
             [
                 $_POST['label'],
-                $_POST['password'], // XXX AES encrypt
+                $_POST['password'],
                 PASS_SECRET,
                 1, // XXX authenticated user
             ],
