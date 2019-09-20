@@ -389,7 +389,7 @@ class Users
             $cache->save($key, $user);
         }
 
-        return $user;
+        return (array) $user;
     }
 
     /**
@@ -423,7 +423,7 @@ class Users
             $cache->save($key, $details);
         }
 
-        return $details;
+        return (array) $details;
     }
 }
 
