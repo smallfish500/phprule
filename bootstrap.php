@@ -89,28 +89,28 @@ case FastRoute\Dispatcher::FOUND:
     );
     if (!is_callable($route[1])) {
         $log->error('ROUTE NOT CALLABLE - '.json_encode($route));
-    } else {
-        header('Content-Type: '.CONTENT_TYPE);
-        $log->notice(SRV_PROTO.' FOUND');
-        if (in_array(REQ_METHOD, ['HEAD', 'GET'])) {
-            header('Allow: '.HTTP_METHODS);
-        } elseif (REQ_METHOD == 'POST') {
-            header(SRV_PROTO.' 201 Created');
-        } elseif (REQ_METHOD == 'PATCH') {
-            //header(SRV_PROTO.' 204 No Content');// XXX creds update
-        } elseif (REQ_METHOD == 'DELETE') {
-            header(SRV_PROTO.' 200 OK');
-        }
-        if (!$res = call_user_func_array($route[1], $route[2])) {
-            $header = SRV_PROTO.' 403 Forbidden';
-            $log->warning($header);
-            header($header);
-        }
-        if (false !== $res && in_array(REQ_METHOD, ['POST', 'PATCH'])) {
-            $location = HOST_URL.BASE.$uri;
-            $location .= REQ_METHOD == 'POST' ? '/'.$res : '';
-            header('Content-Location: '.$location);
-        }
+        break;
+    }
+    header('Content-Type: '.CONTENT_TYPE);
+    $log->notice(SRV_PROTO.' FOUND');
+    if (in_array(REQ_METHOD, ['HEAD', 'GET'])) {
+        header('Allow: '.HTTP_METHODS);
+    } elseif (REQ_METHOD == 'POST') {
+        header(SRV_PROTO.' 201 Created');
+    } elseif (REQ_METHOD == 'PATCH') {
+        //header(SRV_PROTO.' 204 No Content');// XXX creds update
+    } elseif (REQ_METHOD == 'DELETE') {
+        header(SRV_PROTO.' 200 OK');
+    }
+    if (!$res = call_user_func_array($route[1], $route[2])) {
+        $header = SRV_PROTO.' 403 Forbidden';
+        $log->warning($header);
+        header($header);
+    }
+    if (false !== $res && in_array(REQ_METHOD, ['POST', 'PATCH'])) {
+        $location = HOST_URL.BASE.$uri;
+        $location .= REQ_METHOD == 'POST' ? '/'.$res : '';
+        header('Content-Location: '.$location);
     }
     break;
 case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
@@ -127,22 +127,19 @@ default:
 }
 $log->info('Dispatched');
 
-if (DEBUG) {
-    if (!JSON) {
-        $usage = round(memory_get_peak_usage()/1048516, 2).'MB';
-        echo '<pre>';
-        echo '<strong>memory_get_peak_usage</strong>: '.$usage;
-        echo '<br><strong>cache stats</strong>: ';
-        print_r(\Rule\Cache::getDbCache()->getStats());
-        //$logger = \Rule\Database::getDatabase()
-            //->getConfiguration()
-            //->getSqlLogger();
-        //echo '<br>database queries:<br>';
-        //print_r($logger->queries);
-        echo '</pre>';
-    } else {
-        // XXX json debug infos
-    }
+if (DEBUG && !JSON) {
+    $usage = round(memory_get_peak_usage()/1048516, 2).'MB';
+    $stats = \Rule\Cache::getDbCache()->getStats();
+    echo '<pre>';
+    echo '<strong>memory_get_peak_usage</strong>: '.$usage;
+    echo '<br><strong>cache stats</strong>: ';
+    print_r($stats);
+    //$logger = \Rule\Database::getDatabase()
+        //->getConfiguration()
+        //->getSqlLogger();
+    //echo '<br>database queries:<br>';
+    //print_r($logger->queries);
+    echo '</pre>';
 }
 
 $log->info('Bootstrap FINISHED');
