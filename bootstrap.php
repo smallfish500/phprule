@@ -36,7 +36,7 @@ $dispatcher = \FastRoute\simpleDispatcher(
                     'addressbook' => '/users/addressbook/{id:\d+}',
                 ],
                 'delete' => '/users/{id:\d+}',
-                'post' => '/users', // https://www.ietf.org/rfc/rfc2616.txt
+                'post' => '/users',// https://www.ietf.org/rfc/rfc2616.txt
                 'patch' => [// https://www.ietf.org/rfc/rfc5789.txt
                     'modify' => '/users/{id:\d+}',
                     'enable' => '/users/{id:\d+}/enable',
@@ -97,16 +97,19 @@ case FastRoute\Dispatcher::FOUND:
         } elseif (REQ_METHOD == 'POST') {
             header(SRV_PROTO.' 201 Created');
         } elseif (REQ_METHOD == 'PATCH') {
-            header(SRV_PROTO.' 204 No Content'); // XXX 200
-            $location = substr(BASE.$uri, 0, strrpos(BASE.$uri, '/'));
-            header('Content-Location: '.HOST_URL.$location);
+            //header(SRV_PROTO.' 204 No Content');// XXX creds update
         } elseif (REQ_METHOD == 'DELETE') {
             header(SRV_PROTO.' 200 OK');
         }
-        if (!call_user_func_array($route[1], $route[2])) {
+        if (!$res = call_user_func_array($route[1], $route[2])) {
             $header = SRV_PROTO.' 403 Forbidden';
             $log->warning($header);
             header($header);
+        }
+        if (false !== $res && in_array(REQ_METHOD, ['POST', 'PATCH'])) {
+            $location = HOST_URL.BASE.$uri;
+            $location .= REQ_METHOD == 'POST' ? '/'.$res : '';
+            header('Content-Location: '.$location);
         }
     }
     break;
@@ -127,18 +130,18 @@ $log->info('Dispatched');
 if (DEBUG) {
     if (!JSON) {
         $usage = round(memory_get_peak_usage()/1048516, 2).'MB';
-        /*
-        $logger = \Rule\Database::getDatabase()->getConfiguration()->getSqlLogger();
-        */
         echo '<pre>';
         echo '<strong>memory_get_peak_usage</strong>: '.$usage;
         echo '<br><strong>cache stats</strong>: ';
         print_r(\Rule\Cache::getDbCache()->getStats());
+        //$logger = \Rule\Database::getDatabase()
+            //->getConfiguration()
+            //->getSqlLogger();
         //echo '<br>database queries:<br>';
-        //print_r($logger->queries); // XXX
+        //print_r($logger->queries);
         echo '</pre>';
     } else {
-        // XXX
+        // XXX json debug infos
     }
 }
 

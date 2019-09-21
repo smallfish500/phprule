@@ -185,7 +185,7 @@ final class Users
     /**
      * Create one user
      * 
-     * @return bool
+     * @return int Created user identifier
      */
     public static function post()
     {
@@ -207,9 +207,10 @@ final class Users
             ]
         );
 
-        static::one((int) $db->lastInsertId());
+        $user_id = (int) $db->lastInsertId();
+        static::one($user_id);
 
-        return true;
+        return $user_id;
     }
 
     /**
