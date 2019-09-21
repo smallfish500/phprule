@@ -36,7 +36,7 @@ $dispatcher = \FastRoute\simpleDispatcher(
                     'addressbook' => '/users/addressbook/{id:\d+}',
                 ],
                 'delete' => '/users/{id:\d+}',
-                'post' => '/users',// https://www.ietf.org/rfc/rfc2616.txt
+                'post' => '/users', // https://www.ietf.org/rfc/rfc2616.txt
                 'patch' => [// https://www.ietf.org/rfc/rfc5789.txt
                     'modify' => '/users/{id:\d+}',
                     'enable' => '/users/{id:\d+}/enable',

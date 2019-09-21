@@ -120,7 +120,7 @@ final class Users
      *
      * @param int $addressbook_id Addressbook identifier
      *
-     * @return void
+     * @return array
      *
      * @todo add cache
      */
@@ -146,7 +146,7 @@ final class Users
      * @param int $user_id        User identifier
      * @param int $addressbook_id Addressbook identifier
      *
-     * @return void
+     * @return bool
      *
      * @todo add cache
      */
