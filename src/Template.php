@@ -1,9 +1,9 @@
 <?php
 /**
  * Template trait file
- * 
+ *
  * PHP version 7
- * 
+ *
  * @category Model
  * @package  Rule
  * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
@@ -14,7 +14,7 @@ namespace Rule;
 
 /**
  * Template trait
- * 
+ *
  * @category Model
  * @package  Rule
  * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
@@ -26,7 +26,7 @@ trait Template
     /**
      * Diplay the data using Twig
      * or Json format if the JSON constant is true
-     * 
+     *
      * @param array  $data Data that will be displayed
      * @param string $tpl  Template name
      *

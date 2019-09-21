@@ -1,9 +1,9 @@
 <?php
 /**
  * Cache trait file
- * 
+ *
  * PHP version 7
- * 
+ *
  * @category Model
  * @package  Rule
  * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
@@ -14,7 +14,7 @@ namespace Rule;
 
 /**
  * Cache trait
- * 
+ *
  * @category Model
  * @package  Rule
  * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
