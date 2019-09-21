@@ -23,7 +23,7 @@ namespace Rule;
  * @license  https://github.com/smallfish500/phprule/blob/master/LICENSE MIT
  * @link     https://github.com/smallfish500/phprule
  */
-class Users
+final class Users
 {
     use Database;
     use Cache;
@@ -102,24 +102,31 @@ class Users
      * @param int $addressbook_id Addressbook identifier
      *
      * @return bool
-     * 
-     * @todo add cache
      */
     public static function addressbook($addressbook_id)
     {
-        $db = static::getDatabase();
-
-        $addressbook = $db->executeQuery(
-            'SELECT user_id FROM user_addressbook '.
-            'WHERE addressbook_id = ?',
-            [$addressbook_id],
-            [\Doctrine\DBAL\ParameterType::INTEGER]
-        )->fetch();
-        if (!$addressbook) {
+        $user_id = 1; // XXX  authenticated user
+        if (!static::_allowedAddressbook($user_id, $addressbook_id)) {
             return false;
         }
 
-        $users = static::getDatabase()->executeQuery(
+        static::show(['users' => static::_getAddressbookContacts($addressbook_id)]);
+
+        return true;
+    }
+
+    /**
+     * Returns contacts in $addressbook_id
+     *
+     * @param int $addressbook_id Addressbook identifier
+     *
+     * @return void
+     *
+     * @todo add cache
+     */
+    private static function _getAddressbookContacts($addressbook_id)
+    {
+        return static::getDatabase()->executeQuery(
             'SELECT u.*, '.
             'AES_DECRYPT(u.password, UNHEX(SHA2(:secret, 512))) password '.
             'FROM user u '.
@@ -131,10 +138,29 @@ class Users
                 'id' => \Doctrine\DBAL\ParameterType::INTEGER
             ]
         )->fetchAll();
+    }
 
-        static::show(['users' => $users]);
-
-        return true;
+    /**
+     * Returns true if $user_id is allowed to access $addressbook_id
+     *
+     * @param int $user_id        User identifier
+     * @param int $addressbook_id Addressbook identifier
+     *
+     * @return void
+     *
+     * @todo add cache
+     */
+    private static function _allowedAddressbook($user_id, $addressbook_id)
+    {
+        return (bool) static::getDatabase()->executeQuery(
+            'SELECT user_id FROM user_addressbook '.
+            'WHERE addressbook_id = ? AND user_id = ?',
+            [$addressbook_id, $user_id],
+            [
+                \Doctrine\DBAL\ParameterType::INTEGER,
+                \Doctrine\DBAL\ParameterType::INTEGER
+            ]
+        )->fetch();
     }
 
     /**
