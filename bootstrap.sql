@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Aug 29, 2019 at 01:35 AM
+-- Generation Time: Sep 21, 2019 at 06:05 PM
 -- Server version: 10.0.38-MariaDB-0ubuntu0.16.04.1
--- PHP Version: 7.2.21-1+ubuntu16.04.1+deb.sury.org+1
+-- PHP Version: 7.2.22-1+ubuntu16.04.1+deb.sury.org+1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -62,8 +62,9 @@ CREATE TABLE `contact` (
 --
 
 INSERT INTO `contact` (`addressbook_id`, `user_id`, `created`) VALUES
-(1, 1, '2019-08-26 16:35:48'),
-(1, 2, '2019-08-26 16:36:22');
+(1, 1, '2019-09-20 14:30:06'),
+(1, 3, '2019-09-20 14:30:19'),
+(1, 10, '2019-09-20 14:30:06');
 
 -- --------------------------------------------------------
 
@@ -108,7 +109,8 @@ CREATE TABLE `privilege` (
 
 INSERT INTO `privilege` (`id`, `label`, `enabled`, `create_user_id`, `created`, `update_user_id`, `updated`) VALUES
 (1, 'user_display', 1, 1, '2018-11-27 13:09:21', NULL, NULL),
-(2, 'user_edit', 1, 1, '2018-12-12 16:04:41', 1, '2018-12-12 18:00:47');
+(2, 'user_edit', 1, 1, '2018-12-12 16:04:41', 1, '2018-12-12 18:00:47'),
+(3, 'addressbooks_display', 1, 1, '2019-09-20 13:17:37', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -153,6 +155,7 @@ CREATE TABLE `role_privilege` (
 INSERT INTO `role_privilege` (`role_id`, `privilege_id`) VALUES
 (1, 1),
 (1, 2),
+(1, 3),
 (2, 1);
 
 -- --------------------------------------------------------
@@ -177,8 +180,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `label`, `password`, `enabled`, `create_user_id`, `created`, `update_user_id`, `updated`) VALUES
-(1, 'jerome', 0x41b55de2b736783a846d66047e3cb602, 1, 1, '2018-11-27 13:09:21', NULL, NULL),
-(2, 'lea', NULL, 0, 1, '2018-12-12 17:55:45', 1, '2018-12-12 17:59:08');
+(1, 'jerome', 0x74def43734c0f248dc492bd10160004b, 1, 1, '2018-11-27 13:09:21', 1, '2019-09-20 15:10:13'),
+(3, 'zob2zob2zob2', 0xf2d5f1698822dececa116b73c0309aee, 1, 1, '2019-09-19 16:14:56', 1, '2019-09-21 13:33:56'),
+(10, 'misstest', 0x74def43734c0f248dc492bd10160004b, 1, 1, '2019-09-19 16:45:13', 1, '2019-09-20 15:11:06');
 
 -- --------------------------------------------------------
 
@@ -190,6 +194,13 @@ CREATE TABLE `user_addressbook` (
   `user_id` int(11) UNSIGNED NOT NULL,
   `addressbook_id` int(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `user_addressbook`
+--
+
+INSERT INTO `user_addressbook` (`user_id`, `addressbook_id`) VALUES
+(1, 1);
 
 -- --------------------------------------------------------
 
@@ -209,8 +220,8 @@ CREATE TABLE `user_detail` (
 --
 
 INSERT INTO `user_detail` (`user_id`, `detail_id`, `value`, `created`) VALUES
-(1, 1, 0xcd26b765d2f5dca3cfb8a3d7ef982b32b61d775da691e66a52207e0a2b943ae3, '2019-08-26 16:29:44'),
-(1, 2, 0xa438c38043f2f335b4d0191966dc5d8d, '2019-08-26 16:38:52');
+(1, 1, 0x75e5d4669d6d41e347118ce83c315462789fb395b49203160ea709e9f765f1a3, '2019-08-26 16:29:44'),
+(1, 2, 0xdcc49f0997f43c879dd5d9c1ed271204, '2019-08-26 16:38:52');
 
 -- --------------------------------------------------------
 
@@ -228,8 +239,40 @@ CREATE TABLE `user_role` (
 --
 
 INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
-(1, 1),
-(2, 2);
+(1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_wallet`
+--
+
+CREATE TABLE `user_wallet` (
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `wallet_id` int(11) UNSIGNED NOT NULL,
+  `value` blob NOT NULL COMMENT 'AES crypt',
+  `created` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wallet`
+--
+
+CREATE TABLE `wallet` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `label` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `wallet`
+--
+
+INSERT INTO `wallet` (`id`, `label`) VALUES
+(1, 'password'),
+(2, 'token'),
+(3, 'recovery');
 
 --
 -- Indexes for dumped tables
@@ -298,7 +341,6 @@ ALTER TABLE `user_addressbook`
 -- Indexes for table `user_detail`
 --
 ALTER TABLE `user_detail`
-  ADD PRIMARY KEY (`user_id`,`detail_id`),
   ADD KEY `fk_user_detail_detail` (`detail_id`),
   ADD KEY `fk_user_detail_user` (`user_id`);
 
@@ -309,6 +351,20 @@ ALTER TABLE `user_role`
   ADD PRIMARY KEY (`user_id`,`role_id`),
   ADD KEY `IDX_2DE8C6A3A76ED395` (`user_id`),
   ADD KEY `IDX_2DE8C6A3D60322AC` (`role_id`);
+
+--
+-- Indexes for table `user_wallet`
+--
+ALTER TABLE `user_wallet`
+  ADD PRIMARY KEY (`user_id`,`wallet_id`),
+  ADD KEY `fk_user_wallet_wallet` (`wallet_id`),
+  ADD KEY `fk_user_wallet_user` (`user_id`);
+
+--
+-- Indexes for table `wallet`
+--
+ALTER TABLE `wallet`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -330,7 +386,7 @@ ALTER TABLE `detail`
 -- AUTO_INCREMENT for table `privilege`
 --
 ALTER TABLE `privilege`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `role`
@@ -342,7 +398,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `wallet`
+--
+ALTER TABLE `wallet`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
@@ -403,6 +465,13 @@ ALTER TABLE `user_detail`
 ALTER TABLE `user_role`
   ADD CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`),
   ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `user_wallet`
+--
+ALTER TABLE `user_wallet`
+  ADD CONSTRAINT `fk_user_wallet_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `fk_user_wallet_wallet` FOREIGN KEY (`wallet_id`) REFERENCES `wallet` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
