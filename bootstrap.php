@@ -64,7 +64,7 @@ $dispatcher = \FastRoute\simpleDispatcher(
                 } else {
                     $log->error(
                         'BAD ROUTE - Group: '.$group.' Method: '.$method.
-                        ' Value: '.$route
+                        ' Value: '.json_encode($route)
                     );
                 }
             }
@@ -88,7 +88,7 @@ case FastRoute\Dispatcher::FOUND:
         ['GET' => $_GET, 'POST' => $_POST, 'SERVER' => $_SERVER]
     );
     if (!is_callable($route[1])) {
-        $log->error('ROUTE NOT CALLABLE - '.$route);
+        $log->error('ROUTE NOT CALLABLE - '.json_encode($route));
     } else {
         header('Content-Type: '.CONTENT_TYPE);
         $log->notice(SRV_PROTO.' FOUND');
@@ -96,7 +96,6 @@ case FastRoute\Dispatcher::FOUND:
             header('Allow: '.HTTP_METHODS);
         } elseif (REQ_METHOD == 'POST') {
             header(SRV_PROTO.' 201 Created');
-            //header('Content-Location: ', ''); // XXX
         } elseif (REQ_METHOD == 'PATCH') {
             header(SRV_PROTO.' 204 No Content'); // XXX 200
             $location = substr(BASE.$uri, 0, strrpos(BASE.$uri, '/'));
