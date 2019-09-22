@@ -4,6 +4,7 @@
         "doctrine/dbal": "^2.9",
         "twig/twig": "^2.11",
         "monolog/monolog": "^1.24",
-        "twbs/bootstrap": "^4.3"
+        "twbs/bootstrap": "^4.3",
+        "rbdwllr/reallysimplejwt": "^2.1"
     }
 }

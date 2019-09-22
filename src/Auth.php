@@ -11,6 +11,7 @@
  * @link     https://github.com/smallfish500/phprule
  */
 namespace Rule;
+use ReallySimpleJWT\Token as Token;
 
 /**
  * Auth class
@@ -46,7 +47,7 @@ final class Auth
                 $user_id,
                 $wallet_id,
                 $value,
-                TOKEN_SECRET
+                AUTH_SECRET
             ],
             [
                 \Doctrine\DBAL\ParameterType::INTEGER,
@@ -57,5 +58,28 @@ final class Auth
         );
 
         return (int) $db->lastInsertId();
+    }
+
+    /**
+     * Returns a new JWT token
+     *
+     * @param int $user_id User identifier
+     *
+     * @return string Token
+     */
+    public static function get($user_id)
+    {
+        $token = Token::create(
+            $user_id,
+            TOKEN_SECRET,
+            time() + 3600,
+            $_SERVER['SERVER_NAME']
+        );
+        echo json_encode([
+            'header' => Token::getHeader($token, TOKEN_SECRET),
+            'payload' => Token::getPayload($token, TOKEN_SECRET),
+        ]);
+
+        return $token;
     }
 }

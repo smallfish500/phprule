@@ -25,6 +25,7 @@ define(
 );
 define('USER_SECRET', 'mysecret');
 define('PASS_SECRET', 'mysecret');
+define('AUTH_SECRET', 'mysecret');
 define('TOKEN_SECRET', 'mysecret');
 define('DEBUG', true);
 define('SRV_PROTO', $_SERVER['SERVER_PROTOCOL']);

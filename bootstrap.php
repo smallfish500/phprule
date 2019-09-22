@@ -41,8 +41,9 @@ $dispatcher = \FastRoute\simpleDispatcher(
                     'modify' => '/users/{id:\d+}',
                     'enable' => '/users/{id:\d+}/enable',
                     'disable' => '/users/{id:\d+}/disable',
-                ], 
-            ]
+                ],
+            ],
+            'auth' => ['get' => '/auth/{id:\d+}']
         ];
         foreach ($routes as $group => $methods) {
             $namespace = APP.'\\'.
