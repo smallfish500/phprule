@@ -79,6 +79,7 @@ final class Auth
             'header' => Token::getHeader($token, TOKEN_SECRET),
             'payload' => Token::getPayload($token, TOKEN_SECRET),
         ]);
+        //$result = Token::validate($token, TOKEN_SECRET);
 
         return $token;
     }

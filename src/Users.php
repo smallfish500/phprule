@@ -1,9 +1,9 @@
 <?php
 /**
  * User class file
- * 
+ *
  * PHP version 7
- * 
+ *
  * @category Model
  * @package  Rule
  * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
@@ -14,9 +14,9 @@ namespace Rule;
 
 /**
  * User class
- * 
+ *
  * User and Details model
- * 
+ *
  * @category Model
  * @package  Rule
  * @author   Jerome Lamartiniere <jerome@lamartiniere.eu>
@@ -28,6 +28,7 @@ final class Users
     use Database;
     use Cache;
     use Template;
+    use Auth;
 
     const USER_CACHE_KEY = 'user-';
     const DETAILS_CACHE_KEY = 'details-';
@@ -36,7 +37,7 @@ final class Users
      * Get one user without the details
      *
      * @param int $user_id User identifier
-     * 
+     *
      * @return bool
      */
     public static function one($user_id)
@@ -70,7 +71,7 @@ final class Users
      * Get one user with the details
      *
      * @param int $user_id User identifier
-     * 
+     *
      * @return bool
      */
     public static function details($user_id)
@@ -88,7 +89,7 @@ final class Users
      * @param int $user_id User identifier
      *
      * @return int
-     * 
+     *
      * @todo return addressbooks using cache
      */
     public static function addressbooks($user_id)
@@ -184,7 +185,7 @@ final class Users
 
     /**
      * Create one user
-     * 
+     *
      * @return int Created user identifier
      */
     public static function post()
@@ -217,7 +218,7 @@ final class Users
      * Modify one user
      *
      * @param int $user_id User identifier
-     * 
+     *
      * @return bool
      */
     public static function modify($user_id)
@@ -248,16 +249,19 @@ final class Users
             'AES_ENCRYPT(:password, UNHEX(SHA2(:secret, 512))), ' : '').
             'update_user_id = :update_user_id, updated = NOW() WHERE id = :id';
 
-        static::getDatabase()->executeQuery($query, $params, $types);
+        $success = static::getDatabase()->executeQuery($query, $params, $types);
+        $success = $success && static::getDbCache()->delete(
+            static::USER_CACHE_KEY.'-'.$user_id
+        );
 
-        return true;
+        return $success;
     }
 
     /**
      * Enable one user
      *
      * @param int $user_id User identifier
-     * 
+     *
      * @return bool
      */
     public static function enable($user_id)
@@ -271,7 +275,7 @@ final class Users
      * Disable one user
      *
      * @param int $user_id User identifier
-     * 
+     *
      * @return bool
      */
     public static function disable($user_id)
@@ -286,7 +290,7 @@ final class Users
      *
      * @param string $privilege Privilege label
      * @param int    $user_id   User identifier
-     * 
+     *
      * @return boolean
      */
     public static function can($privilege, $user_id = 0)
