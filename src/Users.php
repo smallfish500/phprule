@@ -11,6 +11,7 @@
  * @link     https://github.com/smallfish500/phprule
  */
 namespace Rule;
+use Auth;
 
 /**
  * User class
@@ -28,7 +29,6 @@ final class Users
     use Database;
     use Cache;
     use Template;
-    use Auth;
 
     const USER_CACHE_KEY = 'user-';
     const DETAILS_CACHE_KEY = 'details-';
