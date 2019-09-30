@@ -67,7 +67,7 @@ final class Auth
      *
      * @return string Token
      */
-    public static function get($user_id)
+    private static function getToken($user_id)
     {
         $token = Token::create(
             $user_id,
@@ -82,5 +82,29 @@ final class Auth
         //$result = Token::validate($token, TOKEN_SECRET);
 
         return $token;
+    }
+
+    /**
+     * Returns a token if authentication is a success
+     * or an empty string on failure
+     *
+     * @param string $login User name
+     * @param string $password Base64 user's paswword
+     *
+     * @return A token or an empty string
+     */
+    public static function authenticate($login, $password)
+    {
+        $password = base64_decode($password);
+        $res = static::getDatabase()->executeQuery(
+            'SELECT id, password FROM user WHERE label = ?',
+            [$login],
+            [\Doctrine\DBAL\ParameterType::STRING]
+        )->fetch();
+        if ($password == $res['password']) {
+            return static::getToken($res['id']);
+        } else {
+            return '';
+        }
     }
 }
